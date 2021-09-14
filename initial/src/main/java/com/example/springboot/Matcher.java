@@ -1,16 +1,22 @@
 package com.example.springboot;
 
+import java.awt.image.DataBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Matcher {
 
-    private static ArrayList<Order> buyList = new ArrayList<Order>();
-    private static ArrayList<Order> sellList = new ArrayList<Order>();
-    private static ArrayList<Trade> tradeList = new ArrayList<Trade>();
+    public static ArrayList<Order> buyList = new ArrayList<Order>();
+    public static ArrayList<Order> sellList = new ArrayList<Order>();
+    public static ArrayList<Trade> tradeList = new ArrayList<Trade>();
 
-    private static ArrayList<Order> privateBookSell = new ArrayList<Order>();
-    private static ArrayList<Order> privateBookBuy = new ArrayList<Order>();
-    private static ArrayList<Trade> privateTrade = new ArrayList<Trade>();
+    public static ArrayList<Order> privateBookSell = new ArrayList<Order>();
+    public static ArrayList<Order> privateBookBuy = new ArrayList<Order>();
+    public static ArrayList<Trade> privateTrade = new ArrayList<Trade>();
+
+    public static HashMap<Double,Integer> aggBuy=new HashMap<Double,Integer>();
+    public static HashMap<Double,Integer> aggSell=new HashMap<Double,Integer>();
 
     private static final String BUY= "buy";
     private static final String SELL="sell";
@@ -21,46 +27,45 @@ public class Matcher {
     }
 
     public static void processOrder(Order order){
-        System.out.println(order.action);
-        if (order.action==BUY){
+        if (order.getAction()==BUY){
 
             for (int i=0;i<sellList.size();i++){
-                if (order.account==sellList.get(i).account){
+                if (order.getAccount()==sellList.get(i).getAccount()){
                     System.out.println("User match");
                     continue;
                 }else{
-                    if(order.price>=sellList.get(i).price){
+                    if(order.getPrice()>=sellList.get(i).getPrice()){
                         matchOrder(order,sellList.get(i));
                     }else{
                         System.out.println("No match");
                         break;
                     }
                 }
-                if (order.amount==0){
+                if (order.getAmount()==0){
                     break;
                 }
             }
             removeCompletedMatches(sellList);
-            if (order.amount!=0){
+            if (order.getAmount()!=0){
                 addOrder(order);
             }
-        }else if (order.action==SELL){
+        }else if (order.getAction()==SELL){
             for (int i=0;i<buyList.size();i++){
-                if (order.account==buyList.get(i).account){
+                if (order.getAccount()==buyList.get(i).getAccount()){
                     continue;
                 }else{
-                    if(order.price<=buyList.get(i).price){
+                    if(order.getPrice()<=buyList.get(i).getPrice()){
                         matchOrder(order,buyList.get(i));
                     }else{
                         break;
                     }
                 }
-                if (order.amount==0){
+                if (order.getAmount()==0){
                     break;
                 }
             }
             removeCompletedMatches(buyList);
-            if (order.amount!=0){
+            if (order.getAmount()!=0){
                 addOrder(order);
             }
         }
@@ -68,28 +73,27 @@ public class Matcher {
 
     public static void matchOrder(Order order, Order matchedOrder){
         tradeHistory(order, matchedOrder);
-        if (order.amount==matchedOrder.amount){
-            order.amount=0;
-            matchedOrder.amount=0;
-        }else if (order.amount<=matchedOrder.amount){
-            matchedOrder.amount=matchedOrder.amount-order.amount;
-            order.amount=0;
+        if (order.getAmount()==matchedOrder.getAmount()){
+            order.setAmount(0);
+            matchedOrder.setAmount(0);
+        }else if (order.getAmount()<=matchedOrder.getAmount()){
+            matchedOrder.setAmount(matchedOrder.getAmount()-order.getAmount());
+            order.setAmount(0);
         }else{
-            order.amount=order.amount-matchedOrder.amount;
-            matchedOrder.amount=0;
+            order.setAmount(order.getAmount()-matchedOrder.getAmount());
+            matchedOrder.setAmount(0);
         }
     }
 
     public static void tradeHistory(Order order, Order matchedOrder){
-        int quantity=Math.min(order.amount, matchedOrder.amount);
-        Trade trade= new Trade(order.account, matchedOrder.account, matchedOrder.price , quantity, order.action);
-        System.out.println(trade.account2);
+        int quantity=Math.min(order.getAmount(), matchedOrder.getAmount());
+        Trade trade= new Trade(order.getAccount(), matchedOrder.getAccount(), matchedOrder.getPrice(), quantity, order.getAction());
         tradeList.add(trade);
     }
 
     public static void removeCompletedMatches(ArrayList<Order> list){
         for (int i=0; i<list.size();i++){
-            if(list.get(i).amount==0){
+            if(list.get(i).getAmount()==0){
                 list.remove(i);
                 i=i-1;
             }
@@ -97,9 +101,9 @@ public class Matcher {
     }
 
     public static void addOrder(Order order){
-        if (order.action==BUY){
+        if (order.getAction()==BUY){
             for (int i=0; i<buyList.size();i++){
-                if (buyList.get(i).price>=order.price){
+                if (buyList.get(i).getPrice()>=order.getPrice()){
                     int len=buyList.size()-1;
                     if(i==len){
                         buyList.add(order);
@@ -117,7 +121,7 @@ public class Matcher {
             }
         }else{
             for (int i=0; i<sellList.size();i++){
-                if (sellList.get(i).price<=order.price){
+                if (sellList.get(i).getPrice()<=order.getPrice()){
                     int len=sellList.size()-1;
                     if(i==len){
                         sellList.add(order);
@@ -134,13 +138,12 @@ public class Matcher {
                 sellList.add(order);
             }
         }
-
     }
 
      public static void privateOrderList(String currentAccount, ArrayList<Order> list, ArrayList<Order> privateList){
         for (int i=0;i<list.size();i++){
             Order order=list.get(i);
-            if (order.account==currentAccount){
+            if (order.getAccount()==currentAccount){
                 privateList.add(order);
             }
         }
@@ -155,12 +158,39 @@ public class Matcher {
         }
     }
 
+
+    public static void aggregateBuy(){
+        for (int i=0;i<buyList.size();i++){
+            double price =buyList.get(i).getPrice();
+            if (aggBuy.containsKey(price)){
+                int quantity =aggBuy.get(price) +buyList.get(i).getAmount();
+                aggBuy.put(price, quantity);
+            }else{
+                aggBuy.put(price, buyList.get(i).getAmount());
+            }
+        }
+    }
+
+    public static void aggregateSell(){
+        for (int i=0;i< sellList.size();i++){
+            double price =sellList.get(i).getPrice();
+            if (aggSell.containsKey(price)){
+                int quantity =aggSell.get(price) +sellList.get(i).getAmount();
+                aggSell.put(price, quantity);
+            }else{
+                aggSell.put(price, sellList.get(i).getAmount());
+            }
+        }
+    }
+
     public static void main(String[] args){
-        sellList.add(new Order("User1", 5.00,15,"sell"));
-        sellList.add(new Order("User2", 5.00,15,"sell"));
-        sellList.add(new Order("User2", 15.00,15,"sell"));
-        createOrder("User1", 12.50,10,"buy");
-        System.out.println(sellList.get(1).amount);
+        createOrder("Jessica",12.50,15,"buy");
+        createOrder("Jacob",12.50,10,"buy");
+        createOrder("Jessica",13.50,15,"buy");
+        createOrder("Jacob",13.50,10,"buy");
+        aggregateBuy();
+        Object[] keys=aggBuy.values().toArray();
+        System.out.println(keys[1]);
     }
 
 }
