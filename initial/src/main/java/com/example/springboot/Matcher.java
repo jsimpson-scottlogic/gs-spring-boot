@@ -1,66 +1,60 @@
 package com.example.springboot;
 
-import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Matcher {
 
-    public static ArrayList<Order> buyList = new ArrayList<Order>();
-    public static ArrayList<Order> sellList = new ArrayList<Order>();
-    public static ArrayList<Trade> tradeList = new ArrayList<Trade>();
+    public ArrayList<Order> buyList ;
+    public ArrayList<Order> sellList;
+    public ArrayList<Trade> tradeList;
 
-    public static ArrayList<Order> privateBookSell = new ArrayList<Order>();
-    public static ArrayList<Order> privateBookBuy = new ArrayList<Order>();
-    public static ArrayList<Trade> privateTrade = new ArrayList<Trade>();
+    public Matcher(){
+        buyList = new ArrayList<Order>();
+        sellList = new ArrayList<Order>();
+        tradeList = new ArrayList<Trade>();
+    };
 
-    public static HashMap<Double,Integer> aggBuy=new HashMap<Double,Integer>();
-    public static HashMap<Double,Integer> aggSell=new HashMap<Double,Integer>();
 
-    private static final String BUY= "buy";
-    private static final String SELL="sell";
-
-    public static void createOrder(String account, double price, int amount, String action ) {
+    public void createOrder(String account, double price, int amount, String action ) {
         Order newOrder= new Order(account,price,amount,action);
         processOrder(newOrder);
     }
 
-    public static void processOrder(Order order){
-        if (order.getAction()==BUY){
-
-            for (int i=0;i<sellList.size();i++){
-                if (order.getAccount()==sellList.get(i).getAccount()){
+    public void processOrder(Order order){
+        if (order.getAction().equals("buy")){
+            for (Order value : sellList) {
+                if (order.getAccount().equals(value.getAccount())) {
                     System.out.println("User match");
                     continue;
-                }else{
-                    if(order.getPrice()>=sellList.get(i).getPrice()){
-                        matchOrder(order,sellList.get(i));
-                    }else{
+                } else {
+                    if (order.getPrice() >= value.getPrice()) {
+                        matchOrder(order, value);
+                    } else {
                         System.out.println("No match");
                         break;
                     }
                 }
-                if (order.getAmount()==0){
+                if (order.getAmount() == 0) {
                     break;
                 }
             }
             removeCompletedMatches(sellList);
             if (order.getAmount()!=0){
                 addOrder(order);
-            }
-        }else if (order.getAction()==SELL){
-            for (int i=0;i<buyList.size();i++){
-                if (order.getAccount()==buyList.get(i).getAccount()){
+         }
+        }else if (order.getAction().equals("sell")){
+            for (Order value : buyList) {
+                if (order.getAccount().equals(value.getAccount())) {
                     continue;
-                }else{
-                    if(order.getPrice()<=buyList.get(i).getPrice()){
-                        matchOrder(order,buyList.get(i));
-                    }else{
+                } else {
+                    if (order.getPrice() <= value.getPrice()) {
+                        matchOrder(order, value);
+                    } else {
                         break;
                     }
                 }
-                if (order.getAmount()==0){
+                if (order.getAmount() == 0) {
                     break;
                 }
             }
@@ -71,7 +65,7 @@ public class Matcher {
         }
     }
 
-    public static void matchOrder(Order order, Order matchedOrder){
+    public void matchOrder(Order order, Order matchedOrder){
         tradeHistory(order, matchedOrder);
         if (order.getAmount()==matchedOrder.getAmount()){
             order.setAmount(0);
@@ -85,13 +79,13 @@ public class Matcher {
         }
     }
 
-    public static void tradeHistory(Order order, Order matchedOrder){
+    public void tradeHistory(Order order, Order matchedOrder){
         int quantity=Math.min(order.getAmount(), matchedOrder.getAmount());
         Trade trade= new Trade(order.getAccount(), matchedOrder.getAccount(), matchedOrder.getPrice(), quantity, order.getAction());
         tradeList.add(trade);
     }
 
-    public static void removeCompletedMatches(ArrayList<Order> list){
+    public void removeCompletedMatches(ArrayList<Order> list){
         for (int i=0; i<list.size();i++){
             if(list.get(i).getAmount()==0){
                 list.remove(i);
@@ -100,97 +94,102 @@ public class Matcher {
         }
     }
 
-    public static void addOrder(Order order){
-        if (order.getAction()==BUY){
-            for (int i=0; i<buyList.size();i++){
-                if (buyList.get(i).getPrice()>=order.getPrice()){
-                    int len=buyList.size()-1;
-                    if(i==len){
+    public void addOrder(Order order) {
+
+        if (order.getAction().equals("buy")) {
+            for (int i = 0; i < buyList.size(); i++) {
+                if (buyList.get(i).getPrice() >= order.getPrice()) {
+                    int len = buyList.size() - 1;
+                    if (i == len) {
                         buyList.add(order);
                         break;
-                    }else{
+                    } else {
                         continue;
                     }
-                }else{
-                    buyList.add(i,order);
+                } else {
+                    buyList.add(i, order);
                     break;
                 }
             }
-            if (buyList.size()==0){
+            if (buyList.size() == 0) {
                 buyList.add(order);
             }
-        }else{
-            for (int i=0; i<sellList.size();i++){
-                if (sellList.get(i).getPrice()<=order.getPrice()){
-                    int len=sellList.size()-1;
-                    if(i==len){
+        } else {
+            for (int i = 0; i < sellList.size(); i++) {
+                if (sellList.get(i).getPrice() <= order.getPrice()) {
+                    int len = sellList.size() - 1;
+                    if (i == len) {
                         sellList.add(order);
                         break;
-                    }else{
+                    } else {
                         continue;
                     }
-                }else{
-                    sellList.add(i,order);
+                } else {
+                    sellList.add(i, order);
                     break;
                 }
             }
-            if (sellList.size()==0){
+            if (sellList.size() == 0) {
                 sellList.add(order);
             }
         }
     }
 
-     public static void privateOrderList(String currentAccount, ArrayList<Order> list, ArrayList<Order> privateList){
-        for (int i=0;i<list.size();i++){
-            Order order=list.get(i);
-            if (order.getAccount()==currentAccount){
-                privateList.add(order);
+     public ArrayList<Order> privateBuyList(String currentAccount){
+        ArrayList<Order> privateBuyList= new ArrayList<Order>();
+         for (Order order : buyList) {
+             if (order.getAccount().equals(currentAccount)) {
+                 privateBuyList.add(order);
+             }
+         }
+        return privateBuyList;
+     }
+
+    public ArrayList<Order> privateSellList(String currentAccount){
+        ArrayList<Order> privateSellList= new ArrayList<Order>();
+        for (Order order : sellList) {
+            if (order.getAccount().equals(currentAccount)) {
+                privateSellList.add(order);
             }
         }
+        return privateSellList;
     }
 
-    public static void privateTradeList(String currentAccount){
-        for (int i=0;i<tradeList.size();i++){
-            Trade trade=tradeList.get(i);
-            if (trade.account1==currentAccount || trade.account2==currentAccount){
+    public ArrayList<Trade> privateTradeList(String currentAccount){
+        ArrayList<Trade> privateTrade= new ArrayList<Trade>();
+        for (Trade trade : tradeList) {
+            if (trade.account1 == currentAccount || trade.account2 == currentAccount) {
                 privateTrade.add(trade);
             }
         }
+        return privateTrade;
     }
 
-
-    public static void aggregateBuy(){
-        for (int i=0;i<buyList.size();i++){
-            double price =buyList.get(i).getPrice();
-            if (aggBuy.containsKey(price)){
-                int quantity =aggBuy.get(price) +buyList.get(i).getAmount();
+    public HashMap<Double,Integer> aggregateBuy(){
+        HashMap<Double,Integer> aggBuy=new HashMap<Double,Integer>();
+        for (Order order : buyList) {
+            double price = order.getPrice();
+            if (aggBuy.containsKey(price)) {
+                int quantity = aggBuy.get(price) + order.getAmount();
                 aggBuy.put(price, quantity);
-            }else{
-                aggBuy.put(price, buyList.get(i).getAmount());
+            } else {
+                aggBuy.put(price, order.getAmount());
             }
         }
+        return aggBuy;
     }
 
-    public static void aggregateSell(){
-        for (int i=0;i< sellList.size();i++){
-            double price =sellList.get(i).getPrice();
-            if (aggSell.containsKey(price)){
-                int quantity =aggSell.get(price) +sellList.get(i).getAmount();
+    public HashMap<Double,Integer> aggregateSell(){
+        HashMap<Double,Integer> aggSell=new HashMap<Double,Integer>();
+        for (Order order : sellList) {
+            double price = order.getPrice();
+            if (aggSell.containsKey(price)) {
+                int quantity = aggSell.get(price) + order.getAmount();
                 aggSell.put(price, quantity);
-            }else{
-                aggSell.put(price, sellList.get(i).getAmount());
+            } else {
+                aggSell.put(price, order.getAmount());
             }
         }
+        return aggSell;
     }
-
-    public static void main(String[] args){
-        createOrder("Jessica",12.50,15,"buy");
-        createOrder("Jacob",12.50,10,"buy");
-        createOrder("Jessica",13.50,15,"buy");
-        createOrder("Jacob",13.50,10,"buy");
-        aggregateBuy();
-        Object[] keys=aggBuy.values().toArray();
-        System.out.println(keys[1]);
-    }
-
 }

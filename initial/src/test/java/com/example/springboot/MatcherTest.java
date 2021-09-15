@@ -1,6 +1,7 @@
 package com.example.springboot;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -8,20 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class MatcherTest {
 
-    Matcher underTest = new Matcher();
+    Matcher underTest;
 
     @BeforeEach
     public void setUpEach() {
-         underTest.buyList.clear();
-         underTest.sellList.clear();
-         underTest.tradeList.clear();
+           underTest = new Matcher();
 
-         underTest.privateBookBuy.clear();
-         underTest.privateBookSell.clear();
-         underTest.privateTrade.clear();
-
-         underTest.aggBuy.clear();
-         underTest.aggSell.clear();
     }
 
     @Test
@@ -55,10 +48,12 @@ public class MatcherTest {
     void addToBuyList(){
         underTest.createOrder("Jessica",12.50,10,"buy");
         underTest.createOrder("Jacob",10.50,10,"buy");
+        underTest.createOrder("Jacob",13.50,10,"buy");
         underTest.createOrder("James",11.50,10,"buy");
-        assertEquals("Jessica",underTest.buyList.get(0).getAccount());
-        assertEquals("James",underTest.buyList.get(1).getAccount());
-        assertEquals("Jacob",underTest.buyList.get(2).getAccount());
+        assertEquals("Jacob",underTest.buyList.get(0).getAccount());
+        assertEquals("Jessica",underTest.buyList.get(1).getAccount());
+        assertEquals("James",underTest.buyList.get(2).getAccount());
+        assertEquals("Jacob",underTest.buyList.get(3).getAccount());
     }
 
     @Test
@@ -135,12 +130,20 @@ public class MatcherTest {
     void priceTooHigh(){
         underTest.createOrder("Jessica",12.50,15,"buy");
         underTest.createOrder("Jacob",14.50,10,"sell");
-        assertEquals(1,underTest.buyList.size());
+        assertEquals(0,underTest.tradeList.size());
     }
 
     @Test
-    @DisplayName("Matches with multiple orders when amount large")
-    void multipleTrades(){
+    @DisplayName("Trade doesn't happen when buy price too low")
+    void priceTooLow(){
+        underTest.createOrder("Jacob",14.50,10,"sell");
+        underTest.createOrder("Jessica",12.50,15,"buy");
+        assertEquals(0,underTest.tradeList.size());
+    }
+
+    @Test
+    @DisplayName("Matches with multiple orders when amount large for buy order")
+    void multipleTradesBuy(){
         underTest.createOrder("Jessica",15.50,20,"buy");
         underTest.createOrder("Jacob",14.50,10,"sell");
         underTest.createOrder("James",14.50,5,"sell");
@@ -150,12 +153,38 @@ public class MatcherTest {
     }
 
     @Test
+    @DisplayName("Matches with multiple orders when amount large for buy order")
+    void multipleTradesSell(){
+        underTest.createOrder("Jessica",12.50,20,"sell");
+        underTest.createOrder("Jacob",14.50,10,"buy");
+        underTest.createOrder("James",14.50,5,"buy");
+        assertEquals(2,underTest.tradeList.size());
+        assertEquals(1,underTest.sellList.size());
+        assertEquals(0,underTest.buyList.size());
+    }
+
+    @Test
     @DisplayName("Check private buy list")
     void privateBuyList(){
         underTest.createOrder("Jessica",15.50,20,"buy");
         underTest.createOrder("Jessica",19.50,10,"buy");
-        underTest.privateOrderList("Jessica", underTest.buyList, underTest.privateBookBuy);
-        assertEquals(2,underTest.privateBookBuy.size());
+        underTest.createOrder("Jacob",19.50,10,"buy");
+        ArrayList<Order> privateBuyList=underTest.privateBuyList("Jessica");
+        assertEquals(2,privateBuyList.size());
+        privateBuyList=underTest.privateBuyList("Jacob");
+        assertEquals(1,privateBuyList.size());
+    }
+
+    @Test
+    @DisplayName("Check private sell list")
+    void privateSellList(){
+        underTest.createOrder("Jessica",15.50,20,"sell");
+        underTest.createOrder("Jessica",19.50,10,"sell");
+        underTest.createOrder("Jacob",19.50,10,"sell");
+        ArrayList<Order> privateSellList=underTest.privateSellList("Jessica");
+        assertEquals(2,privateSellList.size());
+        privateSellList=underTest.privateSellList("Jacob");
+        assertEquals(1,privateSellList.size());
     }
 
     @Test
@@ -163,10 +192,11 @@ public class MatcherTest {
     void privateTradeList(){
         underTest.createOrder("Jessica",15.50,20,"sell");
         underTest.createOrder("Jacob",19.50,10,"buy");
-        underTest.privateTradeList("Jessica");
-        assertEquals("Jacob",underTest.privateTrade.get(0).getAccount1());
+        ArrayList<Trade> privateTradeList=underTest.privateTradeList("Jessica");
+        assertEquals("Jacob",privateTradeList.get(0).getAccount1());
+        underTest.privateTradeList("Jacob");
+        assertEquals("Jacob",privateTradeList.get(0).getAccount1());
     }
-
 
     @Test
     @DisplayName("Check aggregate buy")
@@ -175,24 +205,22 @@ public class MatcherTest {
         underTest.createOrder("Jacob",12.50,10,"buy");
         underTest.createOrder("Jessica",13.50,15,"buy");
         underTest.createOrder("Jacob",13.50,10,"buy");
-        underTest.aggregateBuy();
-        Object[] values=underTest.aggBuy.values().toArray();
+        HashMap<Double,Integer> aggBuy=underTest.aggregateBuy();
+        Object[] values=aggBuy.values().toArray();
         assertEquals(25,values[0]);
         assertEquals(25,values[1]);
     }
 
     @Test
-    @DisplayName("Check aggregate sell")
-    void aggregateSell(){
+    @DisplayName("Check aggregate sell when same price added")
+    void aggregateSellAdded(){
         underTest.createOrder("Jessica",12.50,15,"sell");
         underTest.createOrder("Jacob",12.50,10,"sell");
         underTest.createOrder("Jessica",13.50,15,"sell");
         underTest.createOrder("Jacob",13.50,10,"sell");
-        underTest.aggregateSell();
-        Object[] values=underTest.aggSell.values().toArray();
+        HashMap<Double,Integer> aggSell=underTest.aggregateSell();
+        Object[] values=aggSell.values().toArray();
         assertEquals(25,values[0]);
         assertEquals(25,values[1]);
     }
-
-
 }
