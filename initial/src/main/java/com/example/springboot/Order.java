@@ -1,11 +1,14 @@
 package com.example.springboot;
 
 public class Order{
+
+    //Attributes
     private String account;
     private double  price;
     private int amount;
     private String action;
 
+    //Constructor
     public Order(String account, double  price, int amount, String action ){
         this.account=account;
         this.price=price;
@@ -13,6 +16,7 @@ public class Order{
         this.action=action;
     }
 
+    //Methods
     public String getAccount() {
         return account;
     }

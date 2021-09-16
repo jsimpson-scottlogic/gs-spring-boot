@@ -1,12 +1,15 @@
 package com.example.springboot;
 
 public class Trade {
+
+    //Attributes
     String account1;
     String account2;
     int quantity;
     double price;
     String action;
 
+    //Constructor
     public Trade(String account1, String account2, double  price, int quantity, String action ){
         this.account1=account1;
         this.account2=account2;
@@ -15,6 +18,7 @@ public class Trade {
         this.action=action;
     }
 
+    //Methods
     public String getAccount1() {
         return account1;
     }

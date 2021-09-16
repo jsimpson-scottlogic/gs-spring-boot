@@ -11,29 +11,28 @@ public class HelloController {
 
 	Matcher matcher = new Matcher();
 
-	@GetMapping("/")
-	public String index() {
-		return "Hello Jessica!";
+	@GetMapping("/buyOrders")
+	public ArrayList<Order> buyOrders() {
+		ArrayList<Order> buyList = new ArrayList<Order>();
+		buyList=matcher.buyList;
+		return buyList;
 	}
 
-	@GetMapping("/orders")
-	public ArrayList<ArrayList<Order>> orders() {
-		ArrayList<ArrayList<Order>> orderData = new ArrayList<ArrayList<Order>>();
-		ArrayList<Order> buyList=matcher.buyList;
-		orderData.add(buyList);
-		ArrayList<Order> sellList=matcher.sellList;
-		orderData.add(sellList);
-		return orderData;
+	@GetMapping("/sellOrders")
+	public ArrayList<Order> sellOrders() {
+		ArrayList<Order> sellList = new ArrayList<Order>();
+		sellList=matcher.sellList;
+		return sellList;
 	}
 
 	@PostMapping("/placeOrder")
-	public ArrayList<ArrayList<Order>> placeOrder(@RequestBody Order order) {
+	public ArrayList[] placeOrder(@RequestBody Order order) {
 		matcher.processOrder(order);
-		ArrayList<ArrayList<Order>> orderData = new ArrayList<ArrayList<Order>>();
+		ArrayList[] orderData = new ArrayList[2];
 		ArrayList<Order> buyList=matcher.buyList;
-		orderData.add(buyList);
+		orderData[0]=buyList;
 		ArrayList<Order> sellList=matcher.sellList;
-		orderData.add(sellList);
+		orderData[1]=sellList;
 	return orderData;
 	}
 }

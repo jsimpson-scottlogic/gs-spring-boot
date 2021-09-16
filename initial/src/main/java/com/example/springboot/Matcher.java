@@ -5,33 +5,28 @@ import java.util.HashMap;
 
 public class Matcher {
 
+    //Attributes
     public ArrayList<Order> buyList ;
     public ArrayList<Order> sellList;
     public ArrayList<Trade> tradeList;
 
+    //Constructor
     public Matcher(){
         buyList = new ArrayList<Order>();
         sellList = new ArrayList<Order>();
         tradeList = new ArrayList<Trade>();
     };
 
-
-    public void createOrder(String account, double price, int amount, String action ) {
-        Order newOrder= new Order(account,price,amount,action);
-        processOrder(newOrder);
-    }
-
+    //Methods
     public void processOrder(Order order){
         if (order.getAction().equals("buy")){
             for (Order value : sellList) {
                 if (order.getAccount().equals(value.getAccount())) {
-                    System.out.println("User match");
                     continue;
                 } else {
                     if (order.getPrice() >= value.getPrice()) {
                         matchOrder(order, value);
                     } else {
-                        System.out.println("No match");
                         break;
                     }
                 }
@@ -42,7 +37,7 @@ public class Matcher {
             removeCompletedMatches(sellList);
             if (order.getAmount()!=0){
                 addOrder(order);
-         }
+            }
         }else if (order.getAction().equals("sell")){
             for (Order value : buyList) {
                 if (order.getAccount().equals(value.getAccount())) {
@@ -95,7 +90,6 @@ public class Matcher {
     }
 
     public void addOrder(Order order) {
-
         if (order.getAction().equals("buy")) {
             for (int i = 0; i < buyList.size(); i++) {
                 if (buyList.get(i).getPrice() >= order.getPrice()) {
