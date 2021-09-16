@@ -1,8 +1,13 @@
 package com.example.springboot;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@Component
 public class Matcher {
 
     //Attributes
@@ -12,9 +17,9 @@ public class Matcher {
 
     //Constructor
     public Matcher(){
-        buyList = new ArrayList<Order>();
-        sellList = new ArrayList<Order>();
-        tradeList = new ArrayList<Trade>();
+        this.buyList = new ArrayList<Order>();
+        this.sellList = new ArrayList<Order>();
+        this.tradeList = new ArrayList<Trade>();
     };
 
     //Methods
