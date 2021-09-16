@@ -16,27 +16,35 @@ public class HelloController {
 	Matcher matcher;
 	ArrayList<Order> buyList = new ArrayList<Order>();
 	ArrayList<Order> sellList = new ArrayList<Order>();
-	ArrayList[] lists = new ArrayList[2];
 
 	@GetMapping("/buyOrders")
 	public ArrayList<Order> buyOrders(Matcher matcher) {
-		this.buyList=matcher.buyList;
+		buyList=matcher.buyList;
 		return buyList;
 	}
 
 	@GetMapping("/sellOrders")
 	public ArrayList<Order> sellOrders(Matcher matcher) {
-		this.sellList=matcher.sellList;
+		sellList=matcher.sellList;
 		return sellList;
 	}
 
 	@PostMapping("/placeOrder")
 	public  ArrayList[]  placeOrder (@Valid @RequestBody Order order, Matcher matcher) {
+		ArrayList[] lists = new ArrayList[2];
 		matcher.processOrder(order);
-		this.buyList = matcher.buyList;
-		this.sellList = matcher.sellList;
-		this.lists[0]=buyList;
-		this.lists[1]=sellList;
+		buyList = matcher.buyList;
+		sellList = matcher.sellList;
+		lists[0]=buyList;
+		lists[1]=sellList;
 		return lists;
 	}
+
+	@PostMapping("/login")
+	public boolean userLogin (@RequestBody User user) {
+		Login login=new Login();
+		boolean success=login.userLogin(user.getUsername(), user.getPassword());
+		return success;
+	}
+
 }

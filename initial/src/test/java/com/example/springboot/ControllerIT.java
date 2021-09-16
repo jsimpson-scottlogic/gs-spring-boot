@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,11 +79,12 @@ public class ControllerIT {
 
     @Test
     void priceCheck() throws Exception {
-        Order order1 = new Order("Jessica", 0.32, 10, "sell");
+        Order order1 = new Order("Jessica", 0.32 , 10, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk());
     }
+
 
     @Test
     void noUsername() throws Exception {

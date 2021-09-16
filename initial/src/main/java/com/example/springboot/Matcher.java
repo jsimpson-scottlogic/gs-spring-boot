@@ -15,6 +15,9 @@ public class Matcher {
     public ArrayList<Order> sellList;
     public ArrayList<Trade> tradeList;
 
+    public String BUY="buy";
+    public String SELL="sell";
+
     //Constructor
     public Matcher(){
         this.buyList = new ArrayList<Order>();
@@ -24,7 +27,7 @@ public class Matcher {
 
     //Methods
     public void processOrder(Order order){
-        if (order.getAction().equals("buy")){
+        if (order.getAction().equals(BUY)){
             for (Order value : sellList) {
                 if (order.getAccount().equals(value.getAccount())) {
                     continue;
@@ -43,7 +46,7 @@ public class Matcher {
             if (order.getAmount()!=0){
                 addOrder(order);
             }
-        }else if (order.getAction().equals("sell")){
+        }else if (order.getAction().equals(SELL)){
             for (Order value : buyList) {
                 if (order.getAccount().equals(value.getAccount())) {
                     continue;
@@ -95,7 +98,7 @@ public class Matcher {
     }
 
     public void addOrder(Order order) {
-        if (order.getAction().equals("buy")) {
+        if (order.getAction().equals(BUY)) {
             for (int i = 0; i < buyList.size(); i++) {
                 if (buyList.get(i).getPrice() >= order.getPrice()) {
                     int len = buyList.size() - 1;
@@ -113,7 +116,7 @@ public class Matcher {
             if (buyList.size() == 0) {
                 buyList.add(order);
             }
-        } else {
+        } else if (order.getAction().equals(SELL)) {
             for (int i = 0; i < sellList.size(); i++) {
                 if (sellList.get(i).getPrice() <= order.getPrice()) {
                     int len = sellList.size() - 1;
