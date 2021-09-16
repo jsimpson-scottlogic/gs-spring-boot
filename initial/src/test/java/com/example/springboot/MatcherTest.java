@@ -269,4 +269,12 @@ public class MatcherTest {
         assertEquals(25,values[0]);
         assertEquals(25,values[1]);
     }
+
+    @Test
+    @DisplayName("Price validation")
+    void validatePrice(){
+        Order order1= new Order("Jessica",0.00,10,"buy");
+        matcher.processOrder(order1);
+        assertEquals(0,matcher.buyList.size());
+    }
 }

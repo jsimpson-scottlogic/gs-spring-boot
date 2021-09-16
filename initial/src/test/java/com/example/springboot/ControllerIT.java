@@ -61,6 +61,47 @@ public class ControllerIT {
                 .andExpect(jsonPath("[1].length()").value("1"));
     }
 
+
+    @Test
+    void amountZero() throws Exception {
+        Order order1 = new Order("Jessica", 12.50, 0, "sell");
+        this.mockMvc
+                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void priceZero() throws Exception {
+        Order order1 = new Order("Jessica", 0.00, 10, "sell");
+        this.mockMvc
+                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void priceCheck() throws Exception {
+        Order order1 = new Order("Jessica", 0.32, 10, "sell");
+        this.mockMvc
+                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void noUsername() throws Exception {
+        Order order1 = new Order("", 10.00, 10, "sell");
+        this.mockMvc
+                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void noAction() throws Exception {
+        Order order1 = new Order("Jessica", 10.00, 10, "");
+        this.mockMvc
+                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isBadRequest());
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             final ObjectMapper mapper = new ObjectMapper();

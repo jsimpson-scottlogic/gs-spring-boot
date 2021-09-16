@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 import java.util.*;
 
 @RestController
@@ -29,7 +31,7 @@ public class HelloController {
 	}
 
 	@PostMapping("/placeOrder")
-	public  ArrayList[]  placeOrder (@RequestBody Order order, Matcher matcher) {
+	public  ArrayList[]  placeOrder (@Valid @RequestBody Order order, Matcher matcher) {
 		matcher.processOrder(order);
 		this.buyList = matcher.buyList;
 		this.sellList = matcher.sellList;

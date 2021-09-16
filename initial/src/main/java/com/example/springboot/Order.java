@@ -1,11 +1,19 @@
 package com.example.springboot;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class Order{
 
     //Attributes
+    @Size(min=1,message="Account cannot be null")
     private String account;
+    @DecimalMin(value="0.01", message="Price must be greater than 0")
     private double  price;
+    @Min(value=1, message="Amount must be greater than 0")
     private int amount;
+    @Size(min=1,message="Action cannot be null")
     private String action;
 
     //Constructor
