@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,14 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ControllerIT {
+
+    Matcher matcher;
+
+    @BeforeEach
+    public void setUpEach() {
+        matcher = new Matcher();
+
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,6 +44,17 @@ public class ControllerIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("length()").value("0"));
+    }
+
+    @Test
+    void shouldReturnBuyList() throws Exception{
+        Order order1= new Order("Jessica",12.50,10,"buy");
+        matcher.processOrder(order1);
+        this.mockMvc
+                .perform(get("/buyOrders"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("length()").value("1"));
     }
 
 
