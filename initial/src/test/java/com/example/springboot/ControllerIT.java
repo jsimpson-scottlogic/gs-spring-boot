@@ -1,5 +1,6 @@
 package com.example.springboot;
 
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -7,14 +8,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ControllerIT {
@@ -60,7 +65,6 @@ public class ControllerIT {
                 .andExpect(jsonPath("[1].length()").value("1"));
     }
 
-
     @Test
     void amountZero() throws Exception {
         Order order1 = new Order("Jessica", 12.50, 0, "sell");
@@ -85,7 +89,6 @@ public class ControllerIT {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     void noUsername() throws Exception {
         Order order1 = new Order("", 10.00, 10, "sell");
@@ -99,6 +102,48 @@ public class ControllerIT {
         Order order1 = new Order("Jessica", 10.00, 10, "");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isBadRequest());
+    }
+
+//    @Test
+    void validUser() throws Exception{
+        User user1=new User(1,"Jessica","Jessica");
+        String expectedJson="JessicaJessica";
+        MvcResult result=this.mockMvc
+                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson=result.getResponse().getContentAsString();
+        Assert.assertEquals(expectedJson,actualJson);
+    }
+
+    @Test
+    void incorrectPassword() throws Exception{
+        User user1=new User(1,"Jessica","James");
+        String expectedJson="Invalid";
+        MvcResult result=this.mockMvc
+                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson=result.getResponse().getContentAsString();
+        Assert.assertEquals(expectedJson,actualJson);
+    }
+
+    @Test
+    void invalidUsername() throws Exception {
+        User user1=new User(1,"","James");
+        this.mockMvc
+                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void invalidPassword() throws Exception {
+        User user1=new User(1,"James","");
+        this.mockMvc
+                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
                 .andExpect(status().isBadRequest());
     }
 

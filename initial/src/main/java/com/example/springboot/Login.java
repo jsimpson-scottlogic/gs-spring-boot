@@ -1,22 +1,20 @@
 package com.example.springboot;
+import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
+@Component
 public class Login {
 
     private String[] usernameList= {"Jessica", "James", "Jacob"};
     private String[] passwordList= {"Jessica", "James", "Jacob"};
 
-    public boolean userLogin(String username, String password ){
+    public String userLogin(String username, String password ){
         for (int i=0;i<usernameList.length;i++){
             if (usernameList[i].equals(username)){
                 if (passwordList[i].equals(password)){
-                    return true;
+                    return username.concat(password);
                 }
             }
         }
-        return false;
+        return "Invalid";
     }
 }
