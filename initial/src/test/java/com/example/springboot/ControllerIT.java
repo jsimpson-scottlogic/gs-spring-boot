@@ -105,9 +105,11 @@ public class ControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+
+
 //    @Test
     void validUser() throws Exception{
-        User user1=new User(1,"Jessica","Jessica");
+        User user1=new User("Jessica","Jessica");
         String expectedJson="JessicaJessica";
         MvcResult result=this.mockMvc
                 .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
@@ -120,7 +122,7 @@ public class ControllerIT {
 
     @Test
     void incorrectPassword() throws Exception{
-        User user1=new User(1,"Jessica","James");
+        User user1=new User("Jessica","James");
         String expectedJson="Invalid";
         MvcResult result=this.mockMvc
                 .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
@@ -133,7 +135,7 @@ public class ControllerIT {
 
     @Test
     void invalidUsername() throws Exception {
-        User user1=new User(1,"","James");
+        User user1=new User("","James");
         this.mockMvc
                 .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
                 .andExpect(status().isBadRequest());
@@ -141,7 +143,7 @@ public class ControllerIT {
 
     @Test
     void invalidPassword() throws Exception {
-        User user1=new User(1,"James","");
+        User user1=new User("James","");
         this.mockMvc
                 .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
                 .andExpect(status().isBadRequest());

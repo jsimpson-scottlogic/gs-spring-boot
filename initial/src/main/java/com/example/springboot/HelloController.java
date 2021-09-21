@@ -2,12 +2,11 @@ package com.example.springboot;
 
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
+import java.lang.reflect.Array;
 import java.util.*;
 
 @RestController
@@ -24,11 +23,11 @@ public class HelloController {
 
 	ArrayList<Order> buyList = new ArrayList<Order>();
 	ArrayList<Order> sellList = new ArrayList<Order>();
+	ArrayList<Trade> tradeList = new ArrayList<Trade>();
 
 	@GetMapping("/")
 	public String index() {
-		String sentence = "Welcome to the trading app!";
-		return sentence;
+		return "Welcome to the trading app!";
 	}
 
 	@GetMapping("/buyOrders")
@@ -43,27 +42,54 @@ public class HelloController {
 		return sellList;
 	}
 
+	@GetMapping("/allTrades")
+	public ArrayList<Trade> allTrades(){
+		tradeList=matcher.tradeList;
+		return tradeList;
+	}
+
+	@GetMapping("/aggregateBook")
+	public HashMap[] aggregateBook(){
+		HashMap<Double,Integer> aggregateBuy= matcher.aggregateBuy();
+		HashMap<Double,Integer> aggregateSell= matcher.aggregateSell();
+		HashMap[] aggregateBook= new HashMap[2];
+		aggregateBook[0]=aggregateBuy;
+		aggregateBook[1]=aggregateSell;
+		return aggregateBook;
+	}
+
+	@GetMapping("/privateBook")
+	public ArrayList[] privateBook(@Size(min=1,message="Username cannot be null") @RequestBody String username){
+		ArrayList[] privateBook= new ArrayList[3];
+		ArrayList<Order> privateBuy=matcher.privateBuyList(username);
+		ArrayList<Order> privateSell=matcher.privateSellList(username);
+		ArrayList<Trade> privateTrade=matcher.privateTradeList(username);
+		privateBook[0]=privateBuy;
+		privateBook[1]=privateSell;
+		privateBook[2]=privateTrade;
+		return privateBook;
+	}
+
 	@PostMapping("/placeOrder")
-	public  ArrayList[]  placeOrder (@Valid @RequestBody Order order){
-		ArrayList[] lists = new ArrayList[2];
+	public  ArrayList<Order>[] placeOrder (@Valid @RequestBody Order order){
+		ArrayList<Order>[] lists = new ArrayList[2];
 		matcher.processOrder(order);
-		buyList = matcher.buyList;
-		sellList = matcher.sellList;
-		lists[0]=buyList;
-		lists[1]=sellList;
+		lists[0] = matcher.buyList;
+		lists[1]= matcher.sellList;
+		ArrayList[] privateBook=privateBook(order.getAccount());
+		HashMap[] aggregateBook=aggregateBook();
 		return lists;
 	}
 
 	@PostMapping("/login")
-	public String userLogin (@Valid @RequestBody User user) {
-		Login login= new Login();
-		String success=login.userLogin(user.getUsername(), user.getPassword());
-		return success;
+	public String userLogin (@Valid @RequestParam("username") String username, @RequestParam("password") String password) {
+		List<String> users= userService.getAllUsernames();
+		List<String> passwords= userService.getAllPasswords();
+		return login.userLogin(username, password, users,passwords);
 	}
 
 	@PostMapping("/addUser")
-	private int addUser(@RequestBody User user){
+	private void addUser(@Valid @RequestBody User user){
 		userService.add(user);
-		return user.getId();
 	}
 }
