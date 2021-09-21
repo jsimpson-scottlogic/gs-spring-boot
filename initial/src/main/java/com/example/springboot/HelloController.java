@@ -1,3 +1,4 @@
+
 package com.example.springboot;
 
 import com.example.service.UserService;
@@ -35,6 +36,7 @@ public class HelloController {
 	ArrayList<Order> buyList = new ArrayList<Order>();
 	ArrayList<Order> sellList = new ArrayList<Order>();
 	ArrayList<Trade> tradeList = new ArrayList<Trade>();
+	String username;
 
 	@GetMapping("/")
 	public String index() {
@@ -94,21 +96,30 @@ public class HelloController {
 	}
 
 	@PostMapping("/addUser")
-	private void addUser(@Valid @RequestBody User user){
-		userService.add(user);
+	private String addUser(@Valid @RequestBody User user){
+		List<String> users= userService.getAllUsernames();
+		if (users.contains(user.getUsername())){
+			return "Username already taken";
+		}else{
+			userService.add(user);
+			return "User added";
+		}
 	}
 
 	@PostMapping("/login")
-	public String userLogin (@Valid @RequestBody User user) {
-		String token = getJWTToken(user.getUsername());
-		user.setToken(token);
-		return user.getToken();
-
-//		Login login= new Login();
-//		List<String> users= userService.getAllUsernames();
-//		List<String> passwords= userService.getAllPasswords();
-//		boolean success=login.userLogin(user.getUsername(), user.getPassword(), users,passwords);
-//		return success;
+	public String userLogin (@Valid @RequestBody User user) throws Exception {
+		Login login= new Login();
+		List<String> users= userService.getAllUsernames();
+		List<String> passwords= userService.getAllPasswords();
+		username=user.getUsername();
+		boolean success=login.userLogin(username, user.getPassword(), users,passwords);
+		if (success==true){
+			String token = getJWTToken(user.getUsername());
+			user.setToken(token);
+			return user.getToken();
+		}else{
+			return "Invalid";
+		}
 	}
 
 	private String getJWTToken(String username) {

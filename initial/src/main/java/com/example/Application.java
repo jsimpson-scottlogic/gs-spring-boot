@@ -44,6 +44,7 @@ public class Application {
 					.addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 					.authorizeRequests()
 					.antMatchers(HttpMethod.POST, "/login").permitAll()
+					.antMatchers(HttpMethod.POST, "/addUser").permitAll()
 					.anyRequest().authenticated();
 		}
 	}
@@ -51,8 +52,10 @@ public class Application {
 	@Bean
 	CommandLineRunner run(UserService userService){
 		return args -> {
-			userService.add(new User("User1", "User1"));
-			userService.add(new User("User2", "User2"));
+			userService.add(new User("User1", "Password1"));
+			userService.add(new User("User2", "Password2"));
+			userService.add(new User("User3", "Password3"));
+			userService.add(new User("User4", "Password4"));
 		};
 	}
 	
