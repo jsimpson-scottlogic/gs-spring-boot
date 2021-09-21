@@ -1,13 +1,21 @@
 package com.example.springboot;
 
 import com.example.service.UserService;
+//import io.jsonwebtoken.Jwts;
+//import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class HelloController {
@@ -27,7 +35,8 @@ public class HelloController {
 
 	@GetMapping("/")
 	public String index() {
-		return "Welcome to the trading app!";
+		String sentence = "Welcome to the trading app!";
+		return sentence;
 	}
 
 	@GetMapping("/buyOrders")
@@ -71,8 +80,8 @@ public class HelloController {
 	}
 
 	@PostMapping("/placeOrder")
-	public  ArrayList<Order>[] placeOrder (@Valid @RequestBody Order order){
-		ArrayList<Order>[] lists = new ArrayList[2];
+	public  ArrayList[]  placeOrder (@Valid @RequestBody Order order){
+		ArrayList[] lists = new ArrayList[2];
 		matcher.processOrder(order);
 		lists[0] = matcher.buyList;
 		lists[1]= matcher.sellList;
@@ -81,15 +90,17 @@ public class HelloController {
 		return lists;
 	}
 
-	@PostMapping("/login")
-	public String userLogin (@Valid @RequestParam("username") String username, @RequestParam("password") String password) {
-		List<String> users= userService.getAllUsernames();
-		List<String> passwords= userService.getAllPasswords();
-		return login.userLogin(username, password, users,passwords);
-	}
-
 	@PostMapping("/addUser")
 	private void addUser(@Valid @RequestBody User user){
 		userService.add(user);
+	}
+
+	@PostMapping("/login")
+	public boolean userLogin (@Valid @RequestBody User user) {
+		Login login= new Login();
+		List<String> users= userService.getAllUsernames();
+		List<String> passwords= userService.getAllPasswords();
+		boolean success=login.userLogin(user.getUsername(), user.getPassword(), users,passwords);
+		return success;
 	}
 }
