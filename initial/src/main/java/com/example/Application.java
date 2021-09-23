@@ -45,6 +45,7 @@ public class Application {
 					.authorizeRequests()
 					.antMatchers(HttpMethod.POST, "/login").permitAll()
 					.antMatchers(HttpMethod.POST, "/addUser").permitAll()
+					.antMatchers("/h2-console/**").permitAll()
 					.anyRequest().authenticated();
 		}
 	}

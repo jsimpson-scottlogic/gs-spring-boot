@@ -73,7 +73,7 @@ public class HelloController {
 	}
 
 	@GetMapping("/privateBook")
-	public ArrayList[] privateBook(@Size(min=1,message="Username cannot be null") @RequestBody String username){
+	public ArrayList[] privateBook(){
 		ArrayList[] privateBook= new ArrayList[3];
 		ArrayList<Order> privateBuy=matcher.privateBuyList(username);
 		ArrayList<Order> privateSell=matcher.privateSellList(username);
@@ -85,12 +85,13 @@ public class HelloController {
 	}
 
 	@PostMapping("/placeOrder")
-	public  ArrayList[]  placeOrder (@Valid @RequestBody Order order){
+	public  ArrayList[]  placeOrder (@Valid @RequestBody OrderInfo orderinfo){
+		Order order=new Order(username, orderinfo.price,orderinfo.amount,orderinfo.action);
 		ArrayList[] lists = new ArrayList[2];
 		matcher.processOrder(order);
 		lists[0] = matcher.buyList;
 		lists[1]= matcher.sellList;
-		ArrayList[] privateBook=privateBook(order.getAccount());
+		ArrayList[] privateBook=privateBook();
 		HashMap[] aggregateBook=aggregateBook();
 		return lists;
 	}
@@ -118,6 +119,7 @@ public class HelloController {
 			user.setToken(token);
 			return user.getToken();
 		}else{
+			username="";
 			return "Invalid";
 		}
 	}
