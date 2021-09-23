@@ -1,20 +1,32 @@
 package com.example.springboot;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+
+@Entity
+@Table
 public class Trade {
 
-    //Attributes
+    @Id
+    @Column
     @Size(min=1,message="Account cannot be null")
     String account1;
+    @Column
     @Size(min=1,message="Account cannot be null")
     String account2;
+    @Column
     @Min(value=1, message="Amount must be greater than 0")
     int quantity;
+    @Column
     @DecimalMin(value="0.01", message="Price must be greater than 0")
     double price;
+    @Column
     @Size(min=1,message="Action cannot be null")
     String action;
 

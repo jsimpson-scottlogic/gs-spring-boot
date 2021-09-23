@@ -11,11 +11,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -47,7 +49,7 @@ public class ControllerIT {
 
     @Test
     void shouldPlaceABuyOrder() throws Exception {
-        Order order1 = new Order("Jessica", 12.50, 10, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 10, "buy");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk())
@@ -56,8 +58,8 @@ public class ControllerIT {
     }
 
     @Test
-    void shouldPlaceSellOrder() throws Exception {
-        Order order1 = new Order("Jessica", 12.50, 10, "sell");
+    void shouldPlaceSellOrde() throws Exception {
+        Orders order1 = new Orders("Jessica", 12.50, 10, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk())
@@ -67,7 +69,7 @@ public class ControllerIT {
 
     @Test
     void amountZero() throws Exception {
-        Order order1 = new Order("Jessica", 12.50, 0, "sell");
+        Orders order1 = new Orders("Jessica", 12.50, 0, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
@@ -75,7 +77,7 @@ public class ControllerIT {
 
     @Test
     void priceZero() throws Exception {
-        Order order1 = new Order("Jessica", 0.00, 10, "sell");
+        Orders order1 = new Orders("Jessica", 0.00, 10, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
@@ -83,7 +85,7 @@ public class ControllerIT {
 
     @Test
     void priceCheck() throws Exception {
-        Order order1 = new Order("Jessica", 0.32 , 10, "sell");
+        Orders order1 = new Orders("Jessica", 0.32 , 10, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk());
@@ -91,7 +93,7 @@ public class ControllerIT {
 
     @Test
     void noUsername() throws Exception {
-        Order order1 = new Order("", 10.00, 10, "sell");
+        Orders order1 = new Orders("", 10.00, 10, "sell");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
@@ -99,15 +101,13 @@ public class ControllerIT {
 
     @Test
     void noAction() throws Exception {
-        Order order1 = new Order("Jessica", 10.00, 10, "");
+        Orders order1 = new Orders("Jessica", 10.00, 10, "");
         this.mockMvc
                 .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
     }
 
-
-
-//    @Test
+    @Test
     void validUser() throws Exception{
         User user1=new User("Jessica","Jessica");
         String expectedJson="JessicaJessica";
@@ -147,6 +147,32 @@ public class ControllerIT {
         this.mockMvc
                 .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addUser() throws Exception {
+        User user1=new User("User5","User5");
+        String expectedJson="User added";
+        MvcResult result=this.mockMvc
+                .perform(post("/addUser").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson=result.getResponse().getContentAsString();
+        Assert.assertEquals(expectedJson,actualJson);
+    }
+
+    @Test
+    void usernameUsed() throws Exception {
+        User user1=new User("User4","User4");
+        String expectedJson="Username already taken";
+        MvcResult result=this.mockMvc
+                .perform(post("/addUser").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson=result.getResponse().getContentAsString();
+        Assert.assertEquals(expectedJson,actualJson);
     }
 
     public static String asJsonString(final Object obj) {

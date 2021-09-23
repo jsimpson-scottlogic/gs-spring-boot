@@ -6,11 +6,11 @@ import javax.validation.constraints.Size;
 
 public class OrderInfo {
     @DecimalMin(value="0.01", message="Price must be greater than 0")
-    public double  price;
+    private double price;
     @Min(value=1, message="Amount must be greater than 0")
-    public int amount;
+    private int amount;
     @Size(min=1,message="Action cannot be null")
-    public String action;
+    private String action;
 
     public OrderInfo( double  price, int amount, String action ){
         this.price=price;

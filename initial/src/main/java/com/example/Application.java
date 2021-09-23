@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 
 import com.example.service.UserService;
-import com.example.springboot.JWTAuthorizationFilter;
+import com.example.springboot.Filters.JWTAuthorizationFilter;
 import com.example.springboot.User;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -46,7 +46,9 @@ public class Application {
 					.antMatchers(HttpMethod.POST, "/login").permitAll()
 					.antMatchers(HttpMethod.POST, "/addUser").permitAll()
 					.antMatchers("/h2-console/**").permitAll()
+					.antMatchers("/database").permitAll()
 					.anyRequest().authenticated();
+			http.headers().frameOptions().disable();
 		}
 	}
 

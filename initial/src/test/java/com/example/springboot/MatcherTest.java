@@ -20,9 +20,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Remove completed matches")
     void removeCompletedMatches() {
-        Order order1 = new Order("Jessica", 10.50, 0, "buy");
-        Order order2 = new Order("Jessica", 10.50, 2, "buy");
-        ArrayList<Order> list = new ArrayList<Order>();
+        Orders order1 = new Orders("Jessica", 10.50, 0, "buy");
+        Orders order2 = new Orders("Jessica", 10.50, 2, "buy");
+        ArrayList<Orders> list = new ArrayList<Orders>();
         list.add(order1);
         list.add(order2);
         assertEquals(2, list.size());
@@ -33,9 +33,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Remove all completed matches")
     void removeAllCompletedMatches() {
-        Order order1 = new Order("Jessica", 10.50, 0, "buy");
-        Order order2 = new Order("Jessica", 10.50, 0, "buy");
-        ArrayList<Order> list = new ArrayList<Order>();
+        Orders order1 = new Orders("Jessica", 10.50, 0, "buy");
+        Orders order2 = new Orders("Jessica", 10.50, 0, "buy");
+        ArrayList<Orders> list = new ArrayList<Orders>();
         list.add(order1);
         list.add(order2);
         assertEquals(2, list.size());
@@ -46,13 +46,13 @@ public class MatcherTest {
     @Test
     @DisplayName("Orders added to buy list in descending order")
     void addToBuyList() {
-        Order order1 = new Order("Jessica", 12.50, 10, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 10, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 10, "buy");
+        Orders order2 = new Orders("Jacob", 10.50, 10, "buy");
         matcher.processOrder(order2);
-        Order order3 = new Order("Jacob", 13.50, 10, "buy");
+        Orders order3 = new Orders("Jacob", 13.50, 10, "buy");
         matcher.processOrder(order3);
-        Order order4 = new Order("James", 11.50, 10, "buy");
+        Orders order4 = new Orders("James", 11.50, 10, "buy");
         matcher.processOrder(order4);
         assertEquals("Jacob", matcher.buyList.get(0).getAccount());
         assertEquals("Jessica", matcher.buyList.get(1).getAccount());
@@ -63,9 +63,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Remove from buy list")
     void removeFromBuyList() {
-        Order order1 = new Order("Jacob", 12.50, 10, "buy");
+        Orders order1 = new Orders("Jacob", 12.50, 10, "buy");
         matcher.buyList.add(order1);
-        Order order2 = new Order("Jessica", 10.50, 10, "sell");
+        Orders order2 = new Orders("Jessica", 10.50, 10, "sell");
         matcher.processOrder(order2);
         assertEquals(0, matcher.buyList.size());
     }
@@ -74,11 +74,11 @@ public class MatcherTest {
     @Test
     @DisplayName("Orders added to sell list in descending order")
     void addToSellList() {
-        Order order1 = new Order("Jessica", 12.50, 10, "sell");
+        Orders order1 = new Orders("Jessica", 12.50, 10, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 10.50, 10, "sell");
         matcher.processOrder(order2);
-        Order order3 = new Order("James", 11.50, 10, "sell");
+        Orders order3 = new Orders("James", 11.50, 10, "sell");
         matcher.processOrder(order3);
         assertEquals("Jacob", matcher.sellList.get(0).getAccount());
         assertEquals("James", matcher.sellList.get(1).getAccount());
@@ -88,9 +88,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Remove from sell list")
     void removeFromSellList() {
-        Order order1 = new Order("Jacob", 10.50, 10, "sell");
+        Orders order1 = new Orders("Jacob", 10.50, 10, "sell");
         matcher.sellList.add(order1);
-        Order order2 = new Order("Jessica", 12.50, 10, "buy");
+        Orders order2 = new Orders("Jessica", 12.50, 10, "buy");
         matcher.processOrder(order2);
         assertEquals(0, matcher.sellList.size());
     }
@@ -98,9 +98,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Orders added to trade list")
     void addToTradeList() {
-        Order order1 = new Order("Jessica", 12.50, 10, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 10, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 10.50, 10, "sell");
         matcher.processOrder(order2);
         assertEquals(1, matcher.tradeList.size());
     }
@@ -108,9 +108,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Correct quantity added to trade list")
     void addQuantityToTradeList1() {
-        Order order1 = new Order("Jessica", 12.50, 15, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 10.50, 10, "sell");
         matcher.processOrder(order2);
         assertEquals(10, matcher.tradeList.get(0).getQuantity());
     }
@@ -118,9 +118,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Correct quantity added to trade list")
     void addQuantityToTradeList2() {
-        Order order1 = new Order("Jessica", 12.50, 10, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 10, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 15, "sell");
+        Orders order2 = new Orders("Jacob", 10.50, 15, "sell");
         matcher.processOrder(order2);
         assertEquals(10, matcher.tradeList.get(0).getQuantity());
     }
@@ -128,9 +128,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Buy list quantity updated")
     void updateBuyList() {
-        Order order1 = new Order("Jessica", 12.50, 15, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 10.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 10.50, 10, "sell");
         matcher.processOrder(order2);
         assertEquals(5, matcher.buyList.get(0).getAmount());
     }
@@ -138,9 +138,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Sell list quantity updated")
     void updateSellList() {
-        Order order1 = new Order("Jessica", 12.50, 15, "sell");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 14.50, 10, "buy");
+        Orders order2 = new Orders("Jacob", 14.50, 10, "buy");
         matcher.processOrder(order2);
         assertEquals(5, matcher.sellList.get(0).getAmount());
     }
@@ -148,9 +148,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Trade doesn't happen when sell price too high")
     void priceTooHigh() {
-        Order order1 = new Order("Jessica", 12.50, 15, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 14.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 14.50, 10, "sell");
         matcher.processOrder(order2);
         assertEquals(0, matcher.tradeList.size());
     }
@@ -158,9 +158,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Trade doesn't happen when buy price too low")
     void priceTooLow() {
-        Order order1 = new Order("Jacob", 14.50, 10, "sell");
+        Orders order1 = new Orders("Jacob", 14.50, 10, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jessica", 12.50, 15, "buy");
+        Orders order2 = new Orders("Jessica", 12.50, 15, "buy");
         matcher.processOrder(order2);
         assertEquals(0, matcher.tradeList.size());
     }
@@ -168,11 +168,11 @@ public class MatcherTest {
     @Test
     @DisplayName("Matches with multiple orders when amount large for buy order")
     void multipleTradesBuy() {
-        Order order1 = new Order("Jessica", 15.50, 20, "buy");
+        Orders order1 = new Orders("Jessica", 15.50, 20, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 14.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 14.50, 10, "sell");
         matcher.processOrder(order2);
-        Order order3 = new Order("James", 14.50, 5, "sell");
+        Orders order3 = new Orders("James", 14.50, 5, "sell");
         matcher.processOrder(order3);
         assertEquals(2, matcher.tradeList.size());
         assertEquals(0, matcher.sellList.size());
@@ -182,11 +182,11 @@ public class MatcherTest {
     @Test
     @DisplayName("Matches with multiple orders when amount large for buy order")
     void multipleTradesSell() {
-        Order order1 = new Order("Jessica", 12.50, 20, "sell");
+        Orders order1 = new Orders("Jessica", 12.50, 20, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 14.50, 10, "buy");
+        Orders order2 = new Orders("Jacob", 14.50, 10, "buy");
         matcher.processOrder(order2);
-        Order order3 = new Order("James", 14.50, 5, "buy");
+        Orders order3 = new Orders("James", 14.50, 5, "buy");
         matcher.processOrder(order3);
         assertEquals(2, matcher.tradeList.size());
         assertEquals(1, matcher.sellList.size());
@@ -196,13 +196,13 @@ public class MatcherTest {
     @Test
     @DisplayName("Check private buy list")
     void privateBuyList() {
-        Order order1 = new Order("Jessica", 15.50, 20, "buy");
+        Orders order1 = new Orders("Jessica", 15.50, 20, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jessica", 19.50, 10, "buy");
+        Orders order2 = new Orders("Jessica", 19.50, 10, "buy");
         matcher.processOrder(order2);
-        Order order3 = new Order("Jacob", 19.50, 10, "buy");
+        Orders order3 = new Orders("Jacob", 19.50, 10, "buy");
         matcher.processOrder(order3);
-        ArrayList<Order> privateBuyList = matcher.privateBuyList("Jessica");
+        ArrayList<Orders> privateBuyList = matcher.privateBuyList("Jessica");
         assertEquals(2, privateBuyList.size());
         privateBuyList = matcher.privateBuyList("Jacob");
         assertEquals(1, privateBuyList.size());
@@ -211,13 +211,13 @@ public class MatcherTest {
     @Test
     @DisplayName("Check private sell list")
     void privateSellList() {
-        Order order1 = new Order("Jessica", 15.50, 20, "sell");
+        Orders order1 = new Orders("Jessica", 15.50, 20, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jessica", 19.50, 10, "sell");
+        Orders order2 = new Orders("Jessica", 19.50, 10, "sell");
         matcher.processOrder(order2);
-        Order order3 = new Order("Jacob", 19.50, 10, "sell");
+        Orders order3 = new Orders("Jacob", 19.50, 10, "sell");
         matcher.processOrder(order3);
-        ArrayList<Order> privateSellList = matcher.privateSellList("Jessica");
+        ArrayList<Orders> privateSellList = matcher.privateSellList("Jessica");
         assertEquals(2, privateSellList.size());
         privateSellList = matcher.privateSellList("Jacob");
         assertEquals(1, privateSellList.size());
@@ -226,9 +226,9 @@ public class MatcherTest {
     @Test
     @DisplayName("Check private trade list")
     void privateTradeList() {
-        Order order1 = new Order("Jessica", 15.50, 20, "sell");
+        Orders order1 = new Orders("Jessica", 15.50, 20, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 19.50, 10, "buy");
+        Orders order2 = new Orders("Jacob", 19.50, 10, "buy");
         matcher.processOrder(order2);
         ArrayList<Trade> privateTradeList = matcher.privateTradeList("Jessica");
         assertEquals("Jacob", privateTradeList.get(0).getAccount1());
@@ -239,13 +239,13 @@ public class MatcherTest {
     @Test
     @DisplayName("Check aggregate buy")
     void aggregateBuy() {
-        Order order1 = new Order("Jessica", 12.50, 15, "buy");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "buy");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 12.50, 10, "buy");
+        Orders order2 = new Orders("Jacob", 12.50, 10, "buy");
         matcher.processOrder(order2);
-        Order order3 = new Order("Jessica", 13.50, 15, "buy");
+        Orders order3 = new Orders("Jessica", 13.50, 15, "buy");
         matcher.processOrder(order3);
-        Order order4 = new Order("Jacob", 13.50, 10, "buy");
+        Orders order4 = new Orders("Jacob", 13.50, 10, "buy");
         matcher.processOrder(order4);
         HashMap<Double, Integer> aggBuy = matcher.aggregateBuy();
         Object[] values = aggBuy.values().toArray();
@@ -256,13 +256,13 @@ public class MatcherTest {
     @Test
     @DisplayName("Check aggregate sell when same price added")
     void aggregateSellAdded() {
-        Order order1 = new Order("Jessica", 12.50, 15, "sell");
+        Orders order1 = new Orders("Jessica", 12.50, 15, "sell");
         matcher.processOrder(order1);
-        Order order2 = new Order("Jacob", 12.50, 10, "sell");
+        Orders order2 = new Orders("Jacob", 12.50, 10, "sell");
         matcher.processOrder(order2);
-        Order order3 = new Order("Jessica", 13.50, 15, "sell");
+        Orders order3 = new Orders("Jessica", 13.50, 15, "sell");
         matcher.processOrder(order3);
-        Order order4 = new Order("Jacob", 13.50, 10, "sell");
+        Orders order4 = new Orders("Jacob", 13.50, 10, "sell");
         matcher.processOrder(order4);
         HashMap<Double, Integer> aggSell = matcher.aggregateSell();
         Object[] values = aggSell.values().toArray();

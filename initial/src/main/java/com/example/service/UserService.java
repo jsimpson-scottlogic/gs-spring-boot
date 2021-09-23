@@ -33,4 +33,5 @@ public class UserService{
         userRepository.findAll().forEach(user -> users.add(user.getPassword()));
         return users;
     }
+
 }

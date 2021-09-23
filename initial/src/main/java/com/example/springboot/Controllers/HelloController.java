@@ -1,12 +1,15 @@
+package com.example.springboot.Controllers;
 
-package com.example.springboot;
-
+import com.example.service.OrderService;
 import com.example.service.UserService;
+
+import com.example.springboot.*;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
@@ -16,8 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
-import java.lang.reflect.Array;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,10 +35,14 @@ public class HelloController {
 	@Autowired
 	UserService userService;
 
-	ArrayList<Order> buyList = new ArrayList<Order>();
-	ArrayList<Order> sellList = new ArrayList<Order>();
+	@Autowired
+	OrderService orderService;
+
+	ArrayList<Orders> buyList = new ArrayList<Orders>();
+	ArrayList<Orders> sellList = new ArrayList<Orders>();
 	ArrayList<Trade> tradeList = new ArrayList<Trade>();
 	String username;
+	int orderId=0;
 
 	@GetMapping("/")
 	public String index() {
@@ -45,13 +51,13 @@ public class HelloController {
 	}
 
 	@GetMapping("/buyOrders")
-	public ArrayList<Order> buyOrders() {
+	public ArrayList<Orders> buyOrders() {
 		buyList=matcher.buyList;
 		return buyList;
 	}
 
 	@GetMapping("/sellOrders")
-	public ArrayList<Order> sellOrders() {
+	public ArrayList<Orders> sellOrders() {
 		sellList=matcher.sellList;
 		return sellList;
 	}
@@ -75,8 +81,8 @@ public class HelloController {
 	@GetMapping("/privateBook")
 	public ArrayList[] privateBook(){
 		ArrayList[] privateBook= new ArrayList[3];
-		ArrayList<Order> privateBuy=matcher.privateBuyList(username);
-		ArrayList<Order> privateSell=matcher.privateSellList(username);
+		ArrayList<Orders> privateBuy=matcher.privateBuyList(username);
+		ArrayList<Orders> privateSell=matcher.privateSellList(username);
 		ArrayList<Trade> privateTrade=matcher.privateTradeList(username);
 		privateBook[0]=privateBuy;
 		privateBook[1]=privateSell;
@@ -85,15 +91,18 @@ public class HelloController {
 	}
 
 	@PostMapping("/placeOrder")
-	public  ArrayList[]  placeOrder (@Valid @RequestBody OrderInfo orderinfo){
-		Order order=new Order(username, orderinfo.price,orderinfo.amount,orderinfo.action);
+	public void placeOrder (@Valid @RequestBody OrderInfo orderinfo){
+		Orders order=new Orders(username, orderinfo.getPrice(),orderinfo.getAmount(),orderinfo.getAction());
 		ArrayList[] lists = new ArrayList[2];
+		order.setId(orderId);
+		orderId=orderId+1;
+		orderService.save(order);
 		matcher.processOrder(order);
-		lists[0] = matcher.buyList;
-		lists[1]= matcher.sellList;
+		buyList=matcher.buyList;
+		sellList= matcher.sellList;
+		tradeList=matcher.tradeList;
 		ArrayList[] privateBook=privateBook();
 		HashMap[] aggregateBook=aggregateBook();
-		return lists;
 	}
 
 	@PostMapping("/addUser")
@@ -103,6 +112,7 @@ public class HelloController {
 			return "Username already taken";
 		}else{
 			userService.add(user);
+
 			return "User added";
 		}
 	}
@@ -117,6 +127,7 @@ public class HelloController {
 		if (success==true){
 			String token = getJWTToken(user.getUsername());
 			user.setToken(token);
+			userService.add(user);
 			return user.getToken();
 		}else{
 			username="";

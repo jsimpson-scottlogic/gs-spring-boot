@@ -1,5 +1,8 @@
 package com.example.springboot;
 
+import com.example.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -7,12 +10,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 //mark class as an Entity
 @Entity
 //defining class name as Table name
 @Table
 public class User {
+
     @Id
     @Column
     @Size(min=1,message="Username cannot be null")
@@ -30,6 +37,7 @@ public class User {
         this.username=username;
         this.password=password;
     }
+
 
     public String getUsername()
     {
@@ -58,6 +66,5 @@ public class User {
     public void setToken(String token) {
         this.token = token;
     }
-
 
 }

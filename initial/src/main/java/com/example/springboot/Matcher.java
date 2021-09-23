@@ -8,8 +8,8 @@ import java.util.HashMap;
 public class Matcher {
 
     //Attributes
-    public ArrayList<Order> buyList ;
-    public ArrayList<Order> sellList;
+    public ArrayList<Orders> buyList ;
+    public ArrayList<Orders> sellList;
     public ArrayList<Trade> tradeList;
 
     public String BUY="buy";
@@ -17,15 +17,15 @@ public class Matcher {
 
     //Constructor
     public Matcher(){
-        this.buyList = new ArrayList<Order>();
-        this.sellList = new ArrayList<Order>();
+        this.buyList = new ArrayList<Orders>();
+        this.sellList = new ArrayList<Orders>();
         this.tradeList = new ArrayList<Trade>();
     };
 
     //Methods
-    public void processOrder(Order order){
+    public void processOrder(Orders order){
         if (order.getAction().equals(BUY)){
-            for (Order value : sellList) {
+            for (Orders value : sellList) {
                 if (order.getAccount().equals(value.getAccount())) {
                     continue;
                 } else {
@@ -44,7 +44,7 @@ public class Matcher {
                 addOrder(order);
             }
         }else if (order.getAction().equals(SELL)){
-            for (Order value : buyList) {
+            for (Orders value : buyList) {
                 if (order.getAccount().equals(value.getAccount())) {
                     continue;
                 } else {
@@ -65,7 +65,7 @@ public class Matcher {
         }
     }
 
-    public void matchOrder(Order order, Order matchedOrder){
+    public void matchOrder(Orders order, Orders matchedOrder){
         tradeHistory(order, matchedOrder);
         if (order.getAmount()==matchedOrder.getAmount()){
             order.setAmount(0);
@@ -79,13 +79,13 @@ public class Matcher {
         }
     }
 
-    public void tradeHistory(Order order, Order matchedOrder){
+    public void tradeHistory(Orders order, Orders matchedOrder){
         int quantity=Math.min(order.getAmount(), matchedOrder.getAmount());
         Trade trade= new Trade(order.getAccount(), matchedOrder.getAccount(), matchedOrder.getPrice(), quantity, order.getAction());
         tradeList.add(trade);
     }
 
-    public void removeCompletedMatches(ArrayList<Order> list){
+    public void removeCompletedMatches(ArrayList<Orders> list){
         for (int i=0; i<list.size();i++){
             if(list.get(i).getAmount()==0){
                 list.remove(i);
@@ -94,7 +94,7 @@ public class Matcher {
         }
     }
 
-    public void addOrder(Order order) {
+    public void addOrder(Orders order) {
         if (order.getAction().equals(BUY)) {
             for (int i = 0; i < buyList.size(); i++) {
                 if (buyList.get(i).getPrice() >= order.getPrice()) {
@@ -134,9 +134,9 @@ public class Matcher {
         }
     }
 
-     public ArrayList<Order> privateBuyList(String currentAccount){
-        ArrayList<Order> privateBuyList= new ArrayList<Order>();
-         for (Order order : buyList) {
+     public ArrayList<Orders> privateBuyList(String currentAccount){
+        ArrayList<Orders> privateBuyList= new ArrayList<Orders>();
+         for (Orders order : buyList) {
              if (order.getAccount().equals(currentAccount)) {
                  privateBuyList.add(order);
              }
@@ -144,9 +144,9 @@ public class Matcher {
         return privateBuyList;
      }
 
-    public ArrayList<Order> privateSellList(String currentAccount){
-        ArrayList<Order> privateSellList= new ArrayList<Order>();
-        for (Order order : sellList) {
+    public ArrayList<Orders> privateSellList(String currentAccount){
+        ArrayList<Orders> privateSellList= new ArrayList<Orders>();
+        for (Orders order : sellList) {
             if (order.getAccount().equals(currentAccount)) {
                 privateSellList.add(order);
             }
@@ -166,7 +166,7 @@ public class Matcher {
 
     public HashMap<Double,Integer> aggregateBuy(){
         HashMap<Double,Integer> aggBuy=new HashMap<Double,Integer>();
-        for (Order order : buyList) {
+        for (Orders order : buyList) {
             double price = order.getPrice();
             if (aggBuy.containsKey(price)) {
                 int quantity = aggBuy.get(price) + order.getAmount();
@@ -180,7 +180,7 @@ public class Matcher {
 
     public HashMap<Double,Integer> aggregateSell(){
         HashMap<Double,Integer> aggSell=new HashMap<Double,Integer>();
-        for (Order order : sellList) {
+        for (Orders order : sellList) {
             double price = order.getPrice();
             if (aggSell.containsKey(price)) {
                 int quantity = aggSell.get(price) + order.getAmount();
