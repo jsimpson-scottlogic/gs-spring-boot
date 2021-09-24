@@ -1,11 +1,17 @@
 package com.example.springboot;
 
+import com.example.service.OrderService;
+import com.example.service.TradeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Component
 public class Matcher {
+
+    @Autowired
+    TradeService tradeService;
 
     public ArrayList<Orders> buyList ;
     public ArrayList<Orders> sellList;
@@ -80,6 +86,7 @@ public class Matcher {
         int quantity=Math.min(order.getAmount(), matchedOrder.getAmount());
         Trade trade= new Trade(order.getAccount(), matchedOrder.getAccount(), matchedOrder.getPrice(), quantity, order.getAction());
         tradeList.add(trade);
+        tradeService.add(trade);
     }
 
     public void removeCompletedMatches(ArrayList<Orders> list){

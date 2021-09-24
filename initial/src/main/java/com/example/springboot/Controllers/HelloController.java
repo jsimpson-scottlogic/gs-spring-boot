@@ -38,17 +38,14 @@ public class HelloController {
 	@Autowired
 	OrderService orderService;
 
+	@Autowired
+	PlaceOrder placeOrder;
+
 	ArrayList<Orders> buyList = new ArrayList<Orders>();
 	ArrayList<Orders> sellList = new ArrayList<Orders>();
 	ArrayList<Trade> tradeList = new ArrayList<Trade>();
 	String username;
 	int orderId=0;
-
-	@GetMapping("/")
-	public String index() {
-		String sentence = "Welcome to the trading app!";
-		return sentence;
-	}
 
 	@GetMapping("/buyOrders")
 	public ArrayList<Orders> buyOrders() {
@@ -91,18 +88,22 @@ public class HelloController {
 	}
 
 	@PostMapping("/placeOrder")
-	public void placeOrder (@Valid @RequestBody OrderInfo orderinfo){
+	public PlaceOrder placeOrder (@Valid @RequestBody OrderInfo orderinfo){
 		Orders order=new Orders(username, orderinfo.getPrice(),orderinfo.getAmount(),orderinfo.getAction());
-		ArrayList[] lists = new ArrayList[2];
+		ArrayList[] lists = new ArrayList[4];
 		order.setId(orderId);
 		orderId=orderId+1;
 		orderService.save(order);
 		matcher.processOrder(order);
-		buyList=matcher.buyList;
-		sellList= matcher.sellList;
-		tradeList=matcher.tradeList;
+		lists[0]=matcher.tradeList;
 		ArrayList[] privateBook=privateBook();
+		lists[1]=privateBook[0];
+		lists[2]=privateBook[1];
+		lists[3]=privateBook[2];
 		HashMap[] aggregateBook=aggregateBook();
+		placeOrder.setLists(lists);
+		placeOrder.setAggLists(aggregateBook);
+		return placeOrder;
 	}
 
 	@PostMapping("/addUser")
