@@ -7,7 +7,6 @@ import java.util.HashMap;
 @Component
 public class Matcher {
 
-    //Attributes
     public ArrayList<Orders> buyList ;
     public ArrayList<Orders> sellList;
     public ArrayList<Trade> tradeList;
@@ -15,14 +14,12 @@ public class Matcher {
     public String BUY="buy";
     public String SELL="sell";
 
-    //Constructor
     public Matcher(){
         this.buyList = new ArrayList<Orders>();
         this.sellList = new ArrayList<Orders>();
         this.tradeList = new ArrayList<Trade>();
     };
 
-    //Methods
     public void processOrder(Orders order){
         if (order.getAction().equals(BUY)){
             for (Orders value : sellList) {
@@ -157,7 +154,7 @@ public class Matcher {
     public ArrayList<Trade> privateTradeList(String currentAccount){
         ArrayList<Trade> privateTrade= new ArrayList<Trade>();
         for (Trade trade : tradeList) {
-            if (trade.account1 == currentAccount || trade.account2 == currentAccount) {
+            if (trade.account1.equals(currentAccount) || trade.account2.equals(currentAccount)) {
                 privateTrade.add(trade);
             }
         }

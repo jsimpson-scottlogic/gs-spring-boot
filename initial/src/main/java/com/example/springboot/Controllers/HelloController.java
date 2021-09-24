@@ -139,7 +139,6 @@ public class HelloController {
 		String secretKey = "mySecretKey";
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
 				.commaSeparatedStringToAuthorityList("ROLE_USER");
-
 		String token = Jwts
 				.builder()
 				.setId("softtekJWT")

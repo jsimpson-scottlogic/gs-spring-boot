@@ -1,8 +1,12 @@
 package com.example.springboot;
+
+//h2 database
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+//Validation
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -11,32 +15,28 @@ import javax.validation.constraints.Size;
 @Table
 public class Orders{
 
+    //Attributes
     @Id
     @Column
     private int id;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     @Column
     @Size(min=1,message="Account cannot be null")
     private String account;
+
     @Column
     @DecimalMin(value="0.01", message="Price must be greater than 0")
     private double  price;
+
     @Column
     @Min(value=1, message="Amount must be greater than 0")
     private int amount;
+
     @Column
     @Size(min=1,message="Action cannot be null")
     private String action;
 
-    //Constructor
+    //Constructors
     public Orders(String account, double  price, int amount, String action ){
         this.account=account;
         this.price=price;
@@ -78,4 +78,13 @@ public class Orders{
     public void setAction(String action) {
         this.action = action;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }
