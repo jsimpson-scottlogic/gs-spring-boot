@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -20,6 +21,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @SpringBootTest
@@ -31,8 +35,10 @@ public class ControllerIT {
 
     @Test
     void shouldReturnEmptyBuyList() throws Exception{
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(get("/buyOrders"))
+                .perform(get("/buyOrders")
+                        .header("Authorization",accessToken))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("length()").value("0"));
@@ -40,85 +46,68 @@ public class ControllerIT {
 
     @Test
     void shouldReturnEmptySellList() throws Exception{
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(get("/sellOrders"))
-                .andDo(print())
+                .perform(get("/sellOrders").header("Authorization",accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("length()").value("0"));
     }
 
     @Test
     void shouldPlaceABuyOrder() throws Exception {
-        Orders order1 = new Orders("Jessica", 12.50, 10, "buy");
-        this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+        OrderInfo order1 = new OrderInfo( 12.50, 10, "buy");
+        String accessToken = obtainAccessToken("User1", "Password1");
+        MvcResult result=this.mockMvc
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].length()").value("1"))
-                .andExpect(jsonPath("[1].length()").value("0"));
+                .andReturn();
     }
 
     @Test
-    void shouldPlaceSellOrde() throws Exception {
-        Orders order1 = new Orders("Jessica", 12.50, 10, "sell");
+    void shouldPlaceSellOrder() throws Exception {
+        OrderInfo order1 = new OrderInfo(12.50, 10, "sell");
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].length()").value("0"))
-                .andExpect(jsonPath("[1].length()").value("1"));
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .andExpect(status().isOk());
     }
 
     @Test
     void amountZero() throws Exception {
-        Orders order1 = new Orders("Jessica", 12.50, 0, "sell");
+        OrderInfo order1 = new OrderInfo(12.50, 0, "sell");
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void priceZero() throws Exception {
-        Orders order1 = new Orders("Jessica", 0.00, 10, "sell");
+        OrderInfo order1 = new OrderInfo( 0.00, 10, "sell");
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void priceCheck() throws Exception {
-        Orders order1 = new Orders("Jessica", 0.32 , 10, "sell");
+        OrderInfo order1 = new OrderInfo( 0.32 , 10, "sell");
+        String accessToken = obtainAccessToken("User1", "Password1");
         this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void noUsername() throws Exception {
-        Orders order1 = new Orders("", 10.00, 10, "sell");
-        this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void noAction() throws Exception {
+        String accessToken = obtainAccessToken("User1", "Password1");
         Orders order1 = new Orders("Jessica", 10.00, 10, "");
         this.mockMvc
-                .perform(post("/placeOrder").contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
+                .perform(post("/placeOrder").header("Authorization",accessToken).contentType(MediaType.APPLICATION_JSON).content(asJsonString(order1)))
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void validUser() throws Exception{
-        User user1=new User("Jessica","Jessica");
-        String expectedJson="JessicaJessica";
-        MvcResult result=this.mockMvc
-                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualJson=result.getResponse().getContentAsString();
-        Assert.assertEquals(expectedJson,actualJson);
-    }
 
     @Test
     void incorrectPassword() throws Exception{
@@ -183,5 +172,16 @@ public class ControllerIT {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String obtainAccessToken(String username, String password) throws Exception {
+        User user1=new User("User1","Password1");
+        MvcResult result=this.mockMvc
+                .perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user1)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String actualJson=result.getResponse().getContentAsString();
+        return actualJson;
     }
 }

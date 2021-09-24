@@ -11,12 +11,12 @@ public class PlaceOrder {
     private ArrayList[] lists;
     private HashMap[] aggLists;
 
-    private PlaceOrder(ArrayList[] lists, HashMap[] aggLists){
+    public PlaceOrder(ArrayList[] lists, HashMap[] aggLists){
         this.lists=lists;
         this.aggLists=aggLists;
     }
 
-    private PlaceOrder(){}
+    public PlaceOrder(){}
 
     public ArrayList[] getLists() {
         return lists;

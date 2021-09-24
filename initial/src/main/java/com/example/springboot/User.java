@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 
 
 @Entity
+
 @Table
 public class User {
 
@@ -30,15 +31,15 @@ public class User {
     @Size(min=1,message="Token cannot be null")
     private String token;
 
-    //Constructors
+
     public User(){}
 
     public User(String username, String password){
         this.username=username;
-        this.password=encryptPassword(password);
+        this.password=password;
     }
 
-    //Methods
+
     public String getUsername()
     {
         return username;
@@ -55,7 +56,7 @@ public class User {
     }
 
     public void setPassword(String password){
-        this.password = encryptPassword(password);
+        this.password = password;
     }
 
     public String getToken() {
@@ -66,21 +67,4 @@ public class User {
         this.token = token;
     }
 
-    //Password Encryption
-    public String encryptPassword(String password) {
-        String newPassword = "";
-        try {
-            MessageDigest m = MessageDigest.getInstance("MD5");
-            m.update(password.getBytes());
-            byte[] bytes = m.digest();
-            StringBuilder s = new StringBuilder();
-            for (int i = 0; i < bytes.length; i++) {
-                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            newPassword = s.toString();
-        }catch (NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
-        return newPassword;
-    }
 }
