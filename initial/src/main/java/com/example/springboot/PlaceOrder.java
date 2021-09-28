@@ -33,4 +33,5 @@ public class PlaceOrder {
     public void setAggLists(HashMap[] aggLists) {
         this.aggLists = aggLists;
     }
+
 }

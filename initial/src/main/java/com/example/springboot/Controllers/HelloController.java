@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -41,49 +38,38 @@ public class HelloController {
 	@Autowired
 	PlaceOrder placeOrder;
 
-	ArrayList<Orders> buyList = new ArrayList<Orders>();
-	ArrayList<Orders> sellList = new ArrayList<Orders>();
-	ArrayList<Trade> tradeList = new ArrayList<Trade>();
 	String username;
 	int orderId=0;
 
 	@GetMapping("/buyOrders")
 	public ArrayList<Orders> buyOrders() {
-		buyList=matcher.buyList;
-		return buyList;
+		return matcher.buyList;
 	}
 
 	@GetMapping("/sellOrders")
 	public ArrayList<Orders> sellOrders() {
-		sellList=matcher.sellList;
-		return sellList;
+		return matcher.sellList;
 	}
 
 	@GetMapping("/allTrades")
 	public ArrayList<Trade> allTrades(){
-		tradeList=matcher.tradeList;
-		return tradeList;
+		return matcher.tradeList;
 	}
 
 	@GetMapping("/aggregateBook")
 	public HashMap[] aggregateBook(){
-		HashMap<Double,Integer> aggregateBuy= matcher.aggregateBuy();
-		HashMap<Double,Integer> aggregateSell= matcher.aggregateSell();
 		HashMap[] aggregateBook= new HashMap[2];
-		aggregateBook[0]=aggregateBuy;
-		aggregateBook[1]=aggregateSell;
+		aggregateBook[0]=matcher.aggregateBuy();
+		aggregateBook[1]=matcher.aggregateSell();
 		return aggregateBook;
 	}
 
 	@GetMapping("/privateBook")
 	public ArrayList[] privateBook(){
 		ArrayList[] privateBook= new ArrayList[3];
-		ArrayList<Orders> privateBuy=matcher.privateBuyList(username);
-		ArrayList<Orders> privateSell=matcher.privateSellList(username);
-		ArrayList<Trade> privateTrade=matcher.privateTradeList(username);
-		privateBook[0]=privateBuy;
-		privateBook[1]=privateSell;
-		privateBook[2]=privateTrade;
+		privateBook[0]=matcher.privateBuyList(username);
+		privateBook[1]=matcher.privateSellList(username);
+		privateBook[2]=matcher.privateTradeList(username);
 		return privateBook;
 	}
 
@@ -106,7 +92,7 @@ public class HelloController {
 		return placeOrder;
 	}
 
-	@PostMapping("/addUser")
+	@PostMapping("/addUser" )
 	private String addUser(@Valid @RequestBody User user){
 		List<String> users= userService.getAllUsernames();
 		if (users.contains(user.getUsername())){
@@ -119,21 +105,21 @@ public class HelloController {
 	}
 
 	@PostMapping("/login")
-	public String userLogin (@Valid @RequestBody User user) throws Exception {
-		Login login= new Login();
-		List<String> users= userService.getAllUsernames();
-		List<String> passwords= userService.getAllPasswords();
-		username=user.getUsername();
-		boolean success=login.userLogin(username, user.getPassword(), users,passwords);
-		if (success==true){
-			String token = getJWTToken(user.getUsername());
-			user.setToken(token);
+	public String userLogin (@Valid @RequestBody User user) {
+		boolean success=login.userLogin(user, userService.getAllUsernames(),userService.getAllPasswords());
+		if (success){
+			username=user.getUsername();
+			user.setToken(getJWTToken(user.getUsername()));
 			userService.add(user);
 			return user.getToken();
 		}else{
-			username="";
 			return "Invalid";
 		}
+	}
+
+	@GetMapping("/allUsernames")
+	public List<String> getUsernames(){
+		return userService.getAllUsernames();
 	}
 
 	private String getJWTToken(String username) {
@@ -152,7 +138,6 @@ public class HelloController {
 				.setExpiration(new Date(System.currentTimeMillis() + 600000))
 				.signWith(SignatureAlgorithm.HS512,
 						secretKey.getBytes()).compact();
-
 		return "Bearer " + token;
 	}
 }
