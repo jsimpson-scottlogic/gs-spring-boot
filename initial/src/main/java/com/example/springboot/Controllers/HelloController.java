@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin("*")
 public class HelloController {
 
 	@Autowired
@@ -37,6 +38,9 @@ public class HelloController {
 
 	@Autowired
 	PlaceOrder placeOrder;
+
+	@Autowired
+	PlaceOrderBot placeOrderBot;
 
 	String username;
 	int orderId=0;
@@ -57,8 +61,8 @@ public class HelloController {
 	}
 
 	@GetMapping("/aggregateBook")
-	public HashMap[] aggregateBook(){
-		HashMap[] aggregateBook= new HashMap[2];
+	public TreeMap[] aggregateBook(){
+		TreeMap[] aggregateBook= new TreeMap[2];
 		aggregateBook[0]=matcher.aggregateBuy();
 		aggregateBook[1]=matcher.aggregateSell();
 		return aggregateBook;
@@ -86,7 +90,7 @@ public class HelloController {
 		lists[1]=privateBook[0];
 		lists[2]=privateBook[1];
 		lists[3]=privateBook[2];
-		HashMap[] aggregateBook=aggregateBook();
+		TreeMap[] aggregateBook=aggregateBook();
 		placeOrder.setLists(lists);
 		placeOrder.setAggLists(aggregateBook);
 		return placeOrder;
@@ -120,6 +124,34 @@ public class HelloController {
 	@GetMapping("/allUsernames")
 	public List<String> getUsernames(){
 		return userService.getAllUsernames();
+	}
+
+	@GetMapping("/orderBot")
+	public PlaceOrderBot orderBot(){
+				List<String> usernames = userService.getAllUsernames();
+				int b = (int) (Math.random() * (usernames.size()));
+				username = usernames.get(b);
+				double price = Math.round(((Math.random() * (100) + 1) * 100.0)) / 100.0;
+				int amount = (int) (Math.random() * (100) + 1);
+				int number = (int) Math.round(Math.random());
+				String action = "buy";
+				if (number == 0) {
+					action = "buy";
+				} else {
+					action = "sell";
+				}
+
+				Orders order = new Orders(username, price, amount, action);
+				ArrayList[] lists = new ArrayList[1];
+				order.setId(orderId);
+				orderId = orderId + 1;
+				orderService.save(order);
+				matcher.processOrder(order);
+				lists[0] = matcher.tradeList;
+				TreeMap[] aggregateBook = aggregateBook();
+				placeOrderBot.setLists(lists);
+				placeOrderBot.setAggLists(aggregateBook);
+				return placeOrderBot;
 	}
 
 	private String getJWTToken(String username) {

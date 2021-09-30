@@ -7,17 +7,17 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 @Component
-public class PlaceOrder {
+public class PlaceOrderBot {
 
     private ArrayList[] lists;
     private TreeMap[] aggLists;
 
-    public PlaceOrder(ArrayList[] lists, TreeMap[] aggLists){
+    public PlaceOrderBot(ArrayList[] lists, TreeMap[] aggLists){
         this.lists=lists;
         this.aggLists=aggLists;
     }
 
-    public PlaceOrder(){}
+    public PlaceOrderBot(){}
 
     public ArrayList[] getLists() {
         return lists;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 @Component
 public class Matcher {
@@ -138,15 +139,15 @@ public class Matcher {
         }
     }
 
-     public ArrayList<Orders> privateBuyList(String currentAccount){
+    public ArrayList<Orders> privateBuyList(String currentAccount){
         ArrayList<Orders> privateBuyList= new ArrayList<Orders>();
-         for (Orders order : buyList) {
-             if (order.getAccount().equals(currentAccount)) {
-                 privateBuyList.add(order);
-             }
-         }
+        for (Orders order : buyList) {
+            if (order.getAccount().equals(currentAccount)) {
+                privateBuyList.add(order);
+            }
+        }
         return privateBuyList;
-     }
+    }
 
     public ArrayList<Orders> privateSellList(String currentAccount){
         ArrayList<Orders> privateSellList= new ArrayList<Orders>();
@@ -168,8 +169,8 @@ public class Matcher {
         return privateTrade;
     }
 
-    public HashMap<Double,Integer> aggregateBuy(){
-        HashMap<Double,Integer> aggBuy=new HashMap<Double,Integer>();
+    public TreeMap<Double,Integer> aggregateBuy(){
+        TreeMap<Double,Integer> aggBuy=new TreeMap<Double,Integer>();
         for (Orders order : buyList) {
             double price = order.getPrice();
             if (aggBuy.containsKey(price)) {
@@ -182,8 +183,8 @@ public class Matcher {
         return aggBuy;
     }
 
-    public HashMap<Double,Integer> aggregateSell(){
-        HashMap<Double,Integer> aggSell=new HashMap<Double,Integer>();
+    public TreeMap<Double,Integer> aggregateSell(){
+        TreeMap<Double,Integer> aggSell=new TreeMap<Double,Integer>();
         for (Orders order : sellList) {
             double price = order.getPrice();
             if (aggSell.containsKey(price)) {

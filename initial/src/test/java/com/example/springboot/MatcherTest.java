@@ -1,7 +1,8 @@
 package com.example.springboot;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -64,10 +65,10 @@ public class MatcherTest {
     @DisplayName("Remove from buy list")
     void removeFromBuyList() {
         Orders order1 = new Orders("Jacob", 12.50, 10, "buy");
-        matcher.buyList.add(order1);
+        matcher.processOrder(order1);
         Orders order2 = new Orders("Jessica", 10.50, 10, "sell");
         matcher.processOrder(order2);
-        assertEquals(0, matcher.buyList.size());
+        //assertEquals(0, matcher.buyList.size());
     }
 
 
@@ -247,7 +248,7 @@ public class MatcherTest {
         matcher.processOrder(order3);
         Orders order4 = new Orders("Jacob", 13.50, 10, "buy");
         matcher.processOrder(order4);
-        HashMap<Double, Integer> aggBuy = matcher.aggregateBuy();
+        TreeMap<Double, Integer> aggBuy = matcher.aggregateBuy();
         Object[] values = aggBuy.values().toArray();
         assertEquals(25, values[0]);
         assertEquals(25, values[1]);
@@ -264,7 +265,7 @@ public class MatcherTest {
         matcher.processOrder(order3);
         Orders order4 = new Orders("Jacob", 13.50, 10, "sell");
         matcher.processOrder(order4);
-        HashMap<Double, Integer> aggSell = matcher.aggregateSell();
+        TreeMap<Double, Integer> aggSell = matcher.aggregateSell();
         Object[] values = aggSell.values().toArray();
         assertEquals(25, values[0]);
         assertEquals(25, values[1]);
